@@ -4,33 +4,44 @@ import axios from "axios";
 import { useState } from "react"
 import "./index.css"
 
-const Weather = () => {
+let baseUrl = ``;
 
+if (window.location.href.split(":")[0] === 'http') {
+    baseUrl = 'http://localhost:5000'
+
+}
+
+
+const Weather = () => {
     const [weatherData, setWeatherData] = useState(null)
+    // const [cityName, setCityName] = useState(``)
+
 
     const formik = useFormik({
+
         initialValues: {
             cityName: '',
-
         },
+
         validationSchema:
             yup.object({
                 cityName: yup
                     .string('Enter your city')
-
             }),
 
         onSubmit: (values) => {
 
-            axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${values.cityName}&units=metric&appid=a87b897713922e0dae12cddf4a37b07f`)
+            axios.get(`${baseUrl}/weather/`)
                 .then(response => {
                     console.log("response: ", response.data);
 
                     setWeatherData(response.data);
+                    // setCityName(cityName)
                 })
                 .catch(err => {
                     console.log("error: ", err);
                 })
+
         },
     });
 
@@ -43,7 +54,7 @@ const Weather = () => {
                         <input
                             placeholder='Enter City Name'
                             className='input'
-                            fullWidth
+                            required
                             id="cityName"
                             label="cityName"
                             value={formik.values.cityName}
@@ -62,14 +73,18 @@ const Weather = () => {
             {(weatherData === null) ? null :
                 <div className='main'>
                     <div className='left'>
-                        <div className='city'>{(weatherData?.name)}</div>
-                        <div className='temp'>{(weatherData?.main?.temp)}°C</div>
-                        min_Temp: {Math.round(weatherData?.main?.temp_min)}°C
+                        {/* <div className='city'>{(weatherData?.name)}</div>
+                        <div className='temp'>{(weatherData?.main?.temp)}°C</div> */}
+                        Temperature: {Math.round(weatherData?.temp)}°C
                         <br />
-                        max_Temp: {Math.round(weatherData?.main?.temp_max)}°C
+                        min_Temp: {Math.round(weatherData?.min)}°C
                         <br />
+                        max_Temp: {Math.round(weatherData?.max)}°C
+                        <br />
+                        humidity: {Math.round(weatherData?.humidity)}°C
+
                     </div>
-                    <div className='right'>
+                    {/* <div className='right'>
                         Feels like: {(weatherData?.main?.feels_like)}°C
                         <br />
                         Humidity: {(weatherData?.main?.humidity)}%
@@ -77,10 +92,11 @@ const Weather = () => {
                         Visiblity: {(weatherData?.name)}
                         <br />
                         Wind speed: {(weatherData?.wind.speed)} MP/H
-                    </div>
+                    </div> */}
                 </div>
-
             }
+
+
         </div >
     );
 }
